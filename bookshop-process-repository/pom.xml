@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<project
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+	xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>nz.co.bookshop.process</groupId>
+		<artifactId>bookshop-process</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+	</parent>
+	<artifactId>bookshop-process-repository</artifactId>
+	<name>bookshop-process-repository</name>
+
+	<dependencies>
+		<dependency>
+			<groupId>${project.groupId}</groupId>
+			<artifactId>bookshop-process-shared</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+	</dependencies>
+</project>
