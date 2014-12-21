@@ -24,7 +24,7 @@ class ActivitiRestClientAccessor implements RestClientAccessor {
 	String actvitiRestHostUri
 	JsonSlurper jsonSlurper
 
-	public ActivitiRestClientAccessor(Client jerseyClient,final ActivitiRestConfig activitiRestConfig,final JsonSlurper jsonSlurper) {
+	ActivitiRestClientAccessor(Client jerseyClient,final ActivitiRestConfig activitiRestConfig,final JsonSlurper jsonSlurper) {
 		this.jerseyClient = jerseyClient
 		this.jerseyClient.addFilter(new HTTPBasicAuthFilter(activitiRestConfig.authUserId, activitiRestConfig.authPassword))
 		this.actvitiRestHostUri = activitiRestConfig.restHostUri
@@ -32,23 +32,19 @@ class ActivitiRestClientAccessor implements RestClientAccessor {
 	}
 
 	@Override
-	public AbstractRestClientResponse process(final String path,final RestClientExecuteCallback restClientCallback,final int expectedStatus,final String[]... queryParameters) {
+	AbstractRestClientResponse process(final String path,final RestClientExecuteCallback restClientCallback,
+			final int expectedStatus) {
 		checkArgument(!StringUtils.isEmpty(path),"path can not be null")
 		checkArgument(restClientCallback != null,"restClientCallback can not be null")
+		def meta
 		WebResource webResource = jerseyClient.resource(actvitiRestHostUri).path(path)
-		if(queryParameters){
-			queryParameters.each {
-				if(it.length == 2){
-					webResource = webResource.queryParam(it[0],it[1])
-				}
-			}
-		}
 		ClientResponse clientResponse = restClientCallback.execute(webResource)
 		int statusCode = clientResponse.getStatus()
 		String respStr = getResponsePayload(clientResponse)
 		checkState(statusCode == expectedStatus,respStr)
-		def meta = jsonSlurper.parseText(respStr)
+		if(respStr){
+			meta = jsonSlurper.parseText(respStr)
+		}
 		return new AbstractRestClientResponse(statusCode:statusCode,responseMetaData:meta)
 	}
-
 }

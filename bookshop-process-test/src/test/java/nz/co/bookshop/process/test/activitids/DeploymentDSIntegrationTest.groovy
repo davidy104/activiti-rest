@@ -50,7 +50,7 @@ class DeploymentDSIntegrationTest {
 	}
 
 	@Test
-	void getDeploymentByNameAndCategory(){
+	void testGetDeploymentByNameAndCategory(){
 		Map<String,String> resultMap = deploymentDs.getDeployment(TEST_PROCESS_NAME, TEST_PROCESS_CATEGORY)
 		assertNotNull(resultMap)
 		log.info "resultMap:{} $resultMap"

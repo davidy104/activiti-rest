@@ -23,19 +23,6 @@ class DeploymentDSImpl implements DeploymentDS{
 	ActivitiRestClientAccessor activitiRestClientAccessor
 
 	@Override
-	Map getDeployment(final String name,final String category)  {
-		String tenantId = name+":"+category
-		String[] queryParameter = ["tenantId", tenantId]
-		return (Map)activitiRestClientAccessor.process("/repository/deployments", new RestClientExecuteCallback(){
-			@Override
-			ClientResponse execute(WebResource webResource) {
-				webResource.accept(MediaType.APPLICATION_JSON)
-						.type(MediaType.APPLICATION_JSON).get(ClientResponse.class)
-			}
-		},ClientResponse.Status.OK.code,queryParameter).responseMetaData
-	}
-
-	@Override
 	Map deployment(final String name,final String category,final File uploadFile) {
 		String tenantId = "${name}:${category}"
 		String fileName = uploadFile.getName()
@@ -53,6 +40,17 @@ class DeploymentDSImpl implements DeploymentDS{
 						.post(ClientResponse.class, multiPart)
 			}
 		},ClientResponse.Status.CREATED.code).responseMetaData
+	}
+
+	@Override
+	Map getDeployment(final String deployName,final String deployCategory) {
+		return (Map)activitiRestClientAccessor.process("/repository/deployments", new RestClientExecuteCallback(){
+			@Override
+			ClientResponse execute(WebResource webResource) {
+				webResource.queryParam("tenantId", "$deployName:$deployCategory").accept(MediaType.APPLICATION_JSON)
+						.type(MediaType.APPLICATION_JSON).get(ClientResponse.class)
+			}
+		},ClientResponse.Status.OK.code).responseMetaData
 	}
 
 	@Override
