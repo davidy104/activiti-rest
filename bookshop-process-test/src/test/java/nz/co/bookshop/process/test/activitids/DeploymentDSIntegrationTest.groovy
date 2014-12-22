@@ -6,10 +6,12 @@ import static org.hamcrest.CoreMatchers.is
 import static org.hamcrest.CoreMatchers.not
 import static org.junit.Assert.*
 import groovy.util.logging.Slf4j
-import nz.co.bookshop.process.ActivitiSupportModule
 import nz.co.bookshop.process.SharedModule
+import nz.co.bookshop.process.activiti.ActivitiSupportModule
+import nz.co.bookshop.process.activiti.ds.DeploymentDS
 import nz.co.bookshop.process.config.ConfigurationServiceModule
-import nz.co.bookshop.process.ds.DeploymentDS
+import nz.co.bookshop.process.model.activiti.Deployment
+import nz.co.bookshop.process.model.activiti.DeploymentResource
 import nz.co.bookshop.process.test.GuiceJUnitRunner
 import nz.co.bookshop.process.test.GuiceJUnitRunner.GuiceModules
 
@@ -52,31 +54,31 @@ class DeploymentDSIntegrationTest {
 
 	@Test
 	void deployment(){
-		Map<String,String> metaMap = deploymentDs.deployment("laptop", "order", uploadBarFile)
-		assertThat(metaMap['tenantId'], is("laptop:order"))
-		assertNotNull(metaMap['id'])
-		testDeploymentId = metaMap['id']
+		Deployment deployment = deploymentDs.deployment("laptop", "order", uploadBarFile)
+		assertThat(deployment.tenantId, is("laptop:order"))
+		assertNotNull(deployment.id)
+		testDeploymentId = deployment.id
 	}
-	
-	@Test
-	void getDeploymentById(){
-		Map<String,String> resultMap = deploymentDs.getDeployment(testDeploymentId)
-		assertNotNull(resultMap)
-		assertThat(resultMap['tenantId'], is("laptop:order"))
-	}
+
+//	@Test
+//	void getDeploymentById(){
+//		Deployment foundDeploy = deploymentDs.getDeployment(testDeploymentId)
+//		assertNotNull(foundDeploy)
+//		assertThat(foundDeploy.tenantId, is("laptop:order"))
+//	}
 
 	@Test
 	void getDeploymentByNameAndCategory(){
-		Map<String,Object> resultMap = deploymentDs.getDeployment(TEST_PROCESS_NAME, TEST_PROCESS_CATEGORY)
-		log.info "resultMap:{} $resultMap"
-		assertNotNull(resultMap)
-		Map<String,String> dataMap = ((List)resultMap['data']).first()
-		assertThat(dataMap['tenantId'], is("laptop:order"))
+		Deployment foundDeploy = deploymentDs.getDeployment(TEST_PROCESS_NAME, TEST_PROCESS_CATEGORY)
+		log.info "foundDeploy:{} $foundDeploy"
+		assertNotNull(foundDeploy)
+		assertThat(foundDeploy.tenantId, is("laptop:order"))
 	}
-	
+
 	@Test
 	void getDeploymentResources(){
-		List<Map<String,Object>> deployResources = deploymentDs.getDeploymentResource(testDeploymentId)
+		Set<DeploymentResource> deployResources = deploymentDs.getDeploymentResource(testDeploymentId)
+		assertNotNull(deployResources)
 		println "deployResources:{} $deployResources"
 	}
 

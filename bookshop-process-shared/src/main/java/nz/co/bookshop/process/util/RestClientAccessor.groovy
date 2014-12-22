@@ -5,9 +5,8 @@ interface RestClientAccessor {
 	 * 
 	 * @param path
 	 * @param restClientCallback
-	 * @param queryParameters StringArray [parameterName,parameterValue]
 	 * @return
 	 * @throws Exception
 	 */
-	AbstractRestClientResponse process(String path, RestClientExecuteCallback restClientCallback, int expectedStatus) throws Exception
+	String process(String path, int expectedStatus, RestClientExecuteCallback restClientCallback,RestClientCustomErrorHandler... customErrorHandlers) throws Exception
 }

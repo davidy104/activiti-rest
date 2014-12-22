@@ -1,4 +1,4 @@
-package nz.co.bookshop.process.model
+package nz.co.bookshop.process.model.activiti
 
 import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
