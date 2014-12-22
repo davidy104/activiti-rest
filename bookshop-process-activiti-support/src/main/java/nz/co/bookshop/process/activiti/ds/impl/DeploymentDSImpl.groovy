@@ -28,6 +28,8 @@ class DeploymentDSImpl implements DeploymentDS{
 	@Inject
 	DeploymentConverter deploymentConverter
 
+	final static String DEPLOYMENT_PATH="/repository/deployments"
+
 	@Override
 	Deployment deployment(final String name,final String category,final File uploadFile) {
 		String tenantId = "${name}:${category}"
@@ -38,7 +40,7 @@ class DeploymentDSImpl implements DeploymentDS{
 		multiPart.field("tenantId", tenantId)
 		multiPart.bodyPart(new FileDataBodyPart(uploadName, uploadFile))
 
-		String jsonResponse = activitiRestClientAccessor.process("/repository/deployments",ClientResponse.Status.CREATED.code, new RestClientExecuteCallback(){
+		String jsonResponse = activitiRestClientAccessor.process(DEPLOYMENT_PATH,ClientResponse.Status.CREATED.code, new RestClientExecuteCallback(){
 					@Override
 					ClientResponse execute(WebResource webResource) {
 						webResource.type(MediaType.MULTIPART_FORM_DATA)
@@ -52,7 +54,7 @@ class DeploymentDSImpl implements DeploymentDS{
 
 	@Override
 	Deployment getDeployment(final String deployName,final String deployCategory) {
-		String jsonResponse = activitiRestClientAccessor.process("/repository/deployments",ClientResponse.Status.OK.code, new RestClientExecuteCallback(){
+		String jsonResponse = activitiRestClientAccessor.process(DEPLOYMENT_PATH,ClientResponse.Status.OK.code, new RestClientExecuteCallback(){
 					@Override
 					ClientResponse execute(WebResource webResource) {
 						webResource.queryParam("tenantId", "$deployName:$deployCategory").accept(MediaType.APPLICATION_JSON)
@@ -64,7 +66,7 @@ class DeploymentDSImpl implements DeploymentDS{
 
 	@Override
 	Deployment getDeployment(final String deploymentId){
-		return deploymentConverter.jsonToDeployment(activitiRestClientAccessor.process('/repository/deployments/'+deploymentId, ClientResponse.Status.OK.code,new RestClientExecuteCallback(){
+		return deploymentConverter.jsonToDeployment(activitiRestClientAccessor.process(DEPLOYMENT_PATH+deploymentId, ClientResponse.Status.OK.code,new RestClientExecuteCallback(){
 			@Override
 			ClientResponse execute(WebResource webResource) {
 				webResource.accept(MediaType.APPLICATION_JSON)
@@ -75,7 +77,7 @@ class DeploymentDSImpl implements DeploymentDS{
 
 	@Override
 	void unDeployment(final String deploymentId) {
-		activitiRestClientAccessor.process('/repository/deployments/'+deploymentId,ClientResponse.Status.NO_CONTENT.code, new RestClientExecuteCallback(){
+		activitiRestClientAccessor.process(DEPLOYMENT_PATH+deploymentId,ClientResponse.Status.NO_CONTENT.code, new RestClientExecuteCallback(){
 					@Override
 					ClientResponse execute(WebResource webResource) {
 						webResource.accept(MediaType.APPLICATION_JSON)
@@ -86,7 +88,7 @@ class DeploymentDSImpl implements DeploymentDS{
 
 	@Override
 	Set<DeploymentResource> getDeploymentResource(final String deploymentId) {
-		String jsonResponse = activitiRestClientAccessor.process('/repository/deployments/'+deploymentId+'/resources',ClientResponse.Status.OK.code, new RestClientExecuteCallback(){
+		String jsonResponse = activitiRestClientAccessor.process(DEPLOYMENT_PATH+deploymentId+'/resources',ClientResponse.Status.OK.code, new RestClientExecuteCallback(){
 					@Override
 					ClientResponse execute(WebResource webResource) {
 						webResource.accept(MediaType.APPLICATION_JSON)

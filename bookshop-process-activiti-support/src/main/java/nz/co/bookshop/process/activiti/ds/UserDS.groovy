@@ -4,7 +4,7 @@ import nz.co.bookshop.process.model.Page
 
 import com.amazonaws.services.identitymanagement.model.User
 
-public interface UserDS {
+interface UserDS {
 	User getUserById(String userId)
 	User getUserByEmail(String email)
 	User createUser(User addUser) throws Exception
