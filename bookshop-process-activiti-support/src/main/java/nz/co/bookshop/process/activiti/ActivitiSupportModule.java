@@ -1,10 +1,20 @@
 package nz.co.bookshop.process.activiti;
 
 import nz.co.bookshop.process.activiti.convert.DeploymentConverter;
+import nz.co.bookshop.process.activiti.convert.GroupConverter;
+import nz.co.bookshop.process.activiti.convert.UserConverter;
 import nz.co.bookshop.process.activiti.convert.component.DeploymentMapToModel;
 import nz.co.bookshop.process.activiti.convert.component.DeploymentResourceMapToModel;
+import nz.co.bookshop.process.activiti.convert.component.GroupMapToModel;
+import nz.co.bookshop.process.activiti.convert.component.MembershipMapToModel;
+import nz.co.bookshop.process.activiti.convert.component.PageMapToModel;
+import nz.co.bookshop.process.activiti.convert.component.UserMapToModel;
 import nz.co.bookshop.process.activiti.ds.DeploymentDS;
+import nz.co.bookshop.process.activiti.ds.GroupDS;
+import nz.co.bookshop.process.activiti.ds.UserDS;
 import nz.co.bookshop.process.activiti.ds.impl.DeploymentDSImpl;
+import nz.co.bookshop.process.activiti.ds.impl.GroupDSImpl;
+import nz.co.bookshop.process.activiti.ds.impl.UserDSImpl;
 import nz.co.bookshop.process.config.ActivitiRestConfig;
 import nz.co.bookshop.process.config.ConfigurationService;
 
@@ -26,6 +36,10 @@ public class ActivitiSupportModule extends AbstractModule {
 				.asEagerSingleton();
 		bind(DeploymentConverter.class).asEagerSingleton();
 		bind(DeploymentDS.class).to(DeploymentDSImpl.class).asEagerSingleton();
+		bind(GroupConverter.class).asEagerSingleton();
+		bind(GroupDS.class).to(GroupDSImpl.class).asEagerSingleton();
+		bind(UserConverter.class).asEagerSingleton();
+		bind(UserDS.class).to(UserDSImpl.class).asEagerSingleton();
 	}
 
 	public static class ActivitiRestClientAccessorProvider implements Provider<ActivitiRestClientAccessor> {
@@ -56,4 +70,31 @@ public class ActivitiSupportModule extends AbstractModule {
 		return new DeploymentResourceMapToModel();
 	}
 
+	@Provides
+	@Singleton
+	@Named("userMapToModel")
+	public UserMapToModel userMapToModel() {
+		return new UserMapToModel();
+	}
+
+	@Provides
+	@Singleton
+	@Named("pageMapToModel")
+	public PageMapToModel pageMapToModel() {
+		return new PageMapToModel();
+	}
+
+	@Provides
+	@Singleton
+	@Named("membershipMapToModel")
+	public MembershipMapToModel membershipMapToModel() {
+		return new MembershipMapToModel();
+	}
+
+	@Provides
+	@Singleton
+	@Named("groupMapToModel")
+	public GroupMapToModel groupMapToModel() {
+		return new GroupMapToModel();
+	}
 }

@@ -8,6 +8,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore
 class Page {
 	long totalCount
 	int totalPages
+	int pageOffset
+	int pageSize
 	List content =[]
 	@JsonIgnore
 	def metaContent

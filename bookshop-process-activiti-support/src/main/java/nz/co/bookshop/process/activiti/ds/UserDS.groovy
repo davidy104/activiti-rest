@@ -1,8 +1,8 @@
 package nz.co.bookshop.process.activiti.ds;
 
 import nz.co.bookshop.process.model.Page
+import nz.co.bookshop.process.model.activiti.User
 
-import com.amazonaws.services.identitymanagement.model.User
 
 interface UserDS {
 	User getUserById(String userId)
