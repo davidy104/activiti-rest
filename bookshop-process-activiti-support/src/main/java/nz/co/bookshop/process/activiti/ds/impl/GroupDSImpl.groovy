@@ -7,8 +7,9 @@ import nz.co.bookshop.process.activiti.ActivitiRestClientAccessor
 import nz.co.bookshop.process.activiti.OperationType
 import nz.co.bookshop.process.activiti.convert.GroupConverter
 import nz.co.bookshop.process.activiti.ds.GroupDS
-import nz.co.bookshop.process.activiti.model.Group;
-import nz.co.bookshop.process.activiti.model.MemberShip;
+import nz.co.bookshop.process.activiti.model.Group
+import nz.co.bookshop.process.activiti.model.GroupQueryParameter
+import nz.co.bookshop.process.activiti.model.MemberShip
 import nz.co.bookshop.process.model.Page
 import nz.co.bookshop.process.util.RestClientExecuteCallback
 
@@ -27,7 +28,7 @@ class GroupDSImpl implements GroupDS{
 
 	@Inject
 	GroupConverter groupConverter
-	
+
 	final static String GROUP_PATH="/identity/groups/"
 
 	@Override
@@ -66,7 +67,7 @@ class GroupDSImpl implements GroupDS{
 	}
 
 	@Override
-	Page paginateGroup(final int pageOffset,final int pageSize) {
+	Page<Group> paginateGroup(final Map<GroupQueryParameter,String> groupQueryParameters,final Integer pageOffset,final Integer pageSize) {
 		return groupConverter.jsonToGroupPage(activitiRestClientAccessor.process(GROUP_PATH,ClientResponse.Status.OK.code, new RestClientExecuteCallback(){
 			@Override
 			ClientResponse execute(WebResource webResource) {
@@ -76,16 +77,6 @@ class GroupDSImpl implements GroupDS{
 		}))
 	}
 
-	@Override
-	Page paginateGroupByType(final int pageOffset,final int pageSize,final String type) {
-		return groupConverter.jsonToGroupPage(activitiRestClientAccessor.process(GROUP_PATH,ClientResponse.Status.OK.code, new RestClientExecuteCallback(){
-			@Override
-			ClientResponse execute(WebResource webResource) {
-				webResource.queryParam("start", pageOffset).queryParam("size", pageSize).queryParam("type", type).accept(MediaType.APPLICATION_JSON)
-						.type(MediaType.APPLICATION_JSON).get(ClientResponse.class)
-			}
-		}))
-	}
 
 	@Override
 	void deleteGroup(final String groupId) {
@@ -118,11 +109,11 @@ class GroupDSImpl implements GroupDS{
 		checkArgument(!StringUtils.isEmpty(groupId),"groupId can not be null.")
 		checkArgument(!StringUtils.isEmpty(userId),"userId can not be null.")
 		activitiRestClientAccessor.process(GROUP_PATH+groupId+"/members"+userId,ClientResponse.Status.NO_CONTENT.code, new RestClientExecuteCallback(){
-			@Override
-			ClientResponse execute(WebResource webResource) {
-				webResource.accept(MediaType.APPLICATION_JSON)
-						.type(MediaType.APPLICATION_JSON).delete(ClientResponse.class)
-			}
-		})
+					@Override
+					ClientResponse execute(WebResource webResource) {
+						webResource.accept(MediaType.APPLICATION_JSON)
+								.type(MediaType.APPLICATION_JSON).delete(ClientResponse.class)
+					}
+				})
 	}
 }

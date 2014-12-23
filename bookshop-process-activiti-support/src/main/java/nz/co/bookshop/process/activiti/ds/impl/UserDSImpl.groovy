@@ -8,7 +8,8 @@ import nz.co.bookshop.process.activiti.ActivitiRestClientAccessor
 import nz.co.bookshop.process.activiti.OperationType
 import nz.co.bookshop.process.activiti.convert.UserConverter
 import nz.co.bookshop.process.activiti.ds.UserDS
-import nz.co.bookshop.process.activiti.model.User;
+import nz.co.bookshop.process.activiti.model.User
+import nz.co.bookshop.process.activiti.model.UserQueryParameter
 import nz.co.bookshop.process.model.Page
 import nz.co.bookshop.process.util.RestClientExecuteCallback
 
@@ -44,14 +45,14 @@ class UserDSImpl implements UserDS{
 	}
 
 	@Override
-	User getUserByEmail(final String email) {
+	Set<User> getUserByEmail(final String email) {
 		return userConverter.jsonToUsers(activitiRestClientAccessor.process(USER_PATH,ClientResponse.Status.OK.code, new RestClientExecuteCallback(){
 			@Override
 			ClientResponse execute(WebResource webResource) {
 				webResource.queryParam("emailLike", email).accept(MediaType.APPLICATION_JSON)
 						.type(MediaType.APPLICATION_JSON).get(ClientResponse.class)
 			}
-		})).first()
+		}))
 	}
 
 	@Override
@@ -104,23 +105,22 @@ class UserDSImpl implements UserDS{
 	}
 
 	@Override
-	Page paginatingUsersByGroupId(final int pageOffset,final int pageSize,
-			final String groupId) {
+	Page paginatingUsers(final Map<UserQueryParameter, String> userQueryParameters,final Integer pageOffset,final Integer pageSize) {
 		return userConverter.jsonToUserPage(activitiRestClientAccessor.process(USER_PATH,ClientResponse.Status.OK.code, new RestClientExecuteCallback(){
 			@Override
 			ClientResponse execute(WebResource webResource) {
-				webResource.queryParam("memberOfGroup", groupId).queryParam("start", pageOffset).queryParam("size", pageSize).accept(MediaType.APPLICATION_JSON)
-						.type(MediaType.APPLICATION_JSON).get(ClientResponse.class)
-			}
-		}))
-	}
-
-	@Override
-	Page paginatingUsers(final int pageOffset,final int pageSize) {
-		return userConverter.jsonToUserPage(activitiRestClientAccessor.process(USER_PATH,ClientResponse.Status.OK.code, new RestClientExecuteCallback(){
-			@Override
-			ClientResponse execute(WebResource webResource) {
-				webResource.queryParam("start", pageOffset).queryParam("size", pageSize).accept(MediaType.APPLICATION_JSON)
+				if(userQueryParameters){
+					userQueryParameters.each {k,v->
+						webResource = webResource.queryParam(k.name(),v)
+					}
+				}
+				if(pageOffset){
+					webResource.queryParam("start", pageOffset)
+				}
+				if(pageSize){
+					webResource.queryParam("size", pageSize)
+				}
+				webResource.accept(MediaType.APPLICATION_JSON)
 						.type(MediaType.APPLICATION_JSON).get(ClientResponse.class)
 			}
 		}))

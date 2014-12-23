@@ -13,7 +13,7 @@ import com.sun.jersey.api.client.ClientResponse
 import com.sun.jersey.api.client.WebResource
 
 @Slf4j
-class GeneralRestClientAccessor implements RestClientAccessor {
+class GeneralRestClientAccessor {
 
 	protected Client jerseyClient
 	protected String hostUri
@@ -23,7 +23,6 @@ class GeneralRestClientAccessor implements RestClientAccessor {
 		this.hostUri = hostUri;
 	}
 
-	@Override
 	String process(final String path,final int expectedStatus,final RestClientExecuteCallback restClientCallback,final RestClientCustomErrorHandler... customErrorHandlers)  {
 		checkArgument(!StringUtils.isEmpty(path),"path can not be null")
 		checkArgument(restClientCallback != null,"restClientCallback can not be null")
@@ -33,24 +32,28 @@ class GeneralRestClientAccessor implements RestClientAccessor {
 		int statusCode = clientResponse.getStatus()
 		String respStr = getResponsePayload(clientResponse)
 		if(statusCode != expectedStatus){
-			if(customErrorHandlers){
-				customErrorHandlers.each {
-					it.handle(statusCode, respStr)
-				}
-			} else {
-				switch (statusCode) {
-					case ClientResponse.Status.NOT_FOUND.code:
-						throw new NotFoundException(respStr)
-						break
-					case ClientResponse.Status.CONFLICT.code:
-						throw new ConflictException(respStr)
-						break
-					default:
-						throw new IllegalStateException(respStr)
-						break
-				}
-			}
+			this.doErrorHandle(statusCode, respStr, customErrorHandlers)
 		}
 		return respStr
+	}
+
+	void doErrorHandle(final int statusCode,final String responseString,final RestClientCustomErrorHandler... customErrorHandlers){
+		if(customErrorHandlers){
+			customErrorHandlers.each {
+				it.handle(statusCode, responseString)
+			}
+		} else {
+			switch (statusCode) {
+				case ClientResponse.Status.NOT_FOUND.code:
+					throw new NotFoundException(responseString)
+					break
+				case ClientResponse.Status.CONFLICT.code:
+					throw new ConflictException(responseString)
+					break
+				default:
+					throw new IllegalStateException(responseString)
+					break
+			}
+		}
 	}
 }

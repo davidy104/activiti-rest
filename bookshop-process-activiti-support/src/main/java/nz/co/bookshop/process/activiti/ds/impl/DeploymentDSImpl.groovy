@@ -11,7 +11,6 @@ import nz.co.bookshop.process.activiti.model.Deployment
 import nz.co.bookshop.process.activiti.model.DeploymentQueryParameter
 import nz.co.bookshop.process.activiti.model.DeploymentResource
 import nz.co.bookshop.process.model.Page
-import nz.co.bookshop.process.model.PagingAndSortingParameter
 import nz.co.bookshop.process.util.RestClientExecuteCallback
 
 import com.google.inject.Inject
@@ -102,7 +101,7 @@ class DeploymentDSImpl implements DeploymentDS{
 	}
 
 	@Override
-	Page<Deployment> paginateDeployment(final Map<DeploymentQueryParameter, String> deploymentQueryParameters,final Map<PagingAndSortingParameter, String> pagingAndSortingParameters) {
+	Page<Deployment> paginateDeployment(final Map<DeploymentQueryParameter, String> deploymentQueryParameters,final Integer pageOffset,final Integer pageSize) {
 		return deploymentConverter.jsonToDeploymentPage(activitiRestClientAccessor.process(DEPLOYMENT_PATH, ClientResponse.Status.OK.code,new RestClientExecuteCallback(){
 			@Override
 			ClientResponse execute(WebResource webResource) {
@@ -111,10 +110,11 @@ class DeploymentDSImpl implements DeploymentDS{
 						webResource = webResource.queryParam(qk.name(), qv)
 					}
 				}
-				if(pagingAndSortingParameters){
-					pagingAndSortingParameters.each {pk,pv->
-						webResource = webResource.queryParam(pk.name(), pv)
-					}
+				if(pageOffset){
+					webResource = webResource.queryParam("start", pageOffset)
+				}
+				if(pageSize){
+					webResource = webResource.queryParam("size", pageSize)
 				}
 				webResource.accept(MediaType.APPLICATION_JSON)
 						.type(MediaType.APPLICATION_JSON).get(ClientResponse.class)
