@@ -4,6 +4,7 @@ import groovy.util.logging.Slf4j
 import nz.co.bookshop.process.activiti.ActivitiRestClientAccessor
 import nz.co.bookshop.process.activiti.Family
 import nz.co.bookshop.process.activiti.ProcessAction
+import nz.co.bookshop.process.activiti.convert.GeneralModelConverter
 import nz.co.bookshop.process.activiti.convert.ProcessDefinitionConverter
 import nz.co.bookshop.process.activiti.ds.ProcessDefinitionDS
 import nz.co.bookshop.process.activiti.model.Identity
@@ -25,6 +26,9 @@ class ProcessDefinitionDSImpl implements ProcessDefinitionDS{
 
 	@Inject
 	ProcessDefinitionConverter processDefinitionConverter
+	
+	@Inject
+	GeneralModelConverter generalModelConverter
 
 	@Override
 	Page<ProcessDefinition> paginateProcessDefinition(final Map<ProcessDefinitionQueryParameter, String> processQueryParameters,final Integer pageOffset,final Integer pageSize) {
