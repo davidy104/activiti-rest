@@ -6,9 +6,9 @@ import nz.co.bookshop.process.activiti.OperationType
 import nz.co.bookshop.process.activiti.convert.component.GroupMapToModel
 import nz.co.bookshop.process.activiti.convert.component.MembershipMapToModel
 import nz.co.bookshop.process.activiti.convert.component.PageMapToModel
+import nz.co.bookshop.process.activiti.model.Group;
+import nz.co.bookshop.process.activiti.model.MemberShip;
 import nz.co.bookshop.process.model.Page
-import nz.co.bookshop.process.model.activiti.Group
-import nz.co.bookshop.process.model.activiti.MemberShip
 
 import com.google.inject.Inject
 

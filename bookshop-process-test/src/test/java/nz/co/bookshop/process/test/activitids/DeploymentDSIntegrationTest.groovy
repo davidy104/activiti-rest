@@ -9,12 +9,15 @@ import groovy.util.logging.Slf4j
 import nz.co.bookshop.process.SharedModule
 import nz.co.bookshop.process.activiti.ActivitiSupportModule
 import nz.co.bookshop.process.activiti.ds.DeploymentDS
+import nz.co.bookshop.process.activiti.model.Deployment
+import nz.co.bookshop.process.activiti.model.DeploymentQueryParameter
+import nz.co.bookshop.process.activiti.model.DeploymentResource
 import nz.co.bookshop.process.config.ConfigurationServiceModule
-import nz.co.bookshop.process.model.activiti.Deployment
-import nz.co.bookshop.process.model.activiti.DeploymentResource
+import nz.co.bookshop.process.model.Page
 import nz.co.bookshop.process.test.GuiceJUnitRunner
 import nz.co.bookshop.process.test.GuiceJUnitRunner.GuiceModules
 
+import org.junit.Assume
 import org.junit.BeforeClass
 import org.junit.FixMethodOrder
 import org.junit.Test
@@ -60,15 +63,17 @@ class DeploymentDSIntegrationTest {
 		testDeploymentId = deployment.id
 	}
 
-//	@Test
-//	void getDeploymentById(){
-//		Deployment foundDeploy = deploymentDs.getDeployment(testDeploymentId)
-//		assertNotNull(foundDeploy)
-//		assertThat(foundDeploy.tenantId, is("laptop:order"))
-//	}
+	@Test
+	void getDeploymentById(){
+		Assume.assumeNotNull(testDeploymentId)
+		Deployment foundDeploy = deploymentDs.getDeployment(testDeploymentId)
+		assertNotNull(foundDeploy)
+		assertThat(foundDeploy.tenantId, is("laptop:order"))
+	}
 
 	@Test
 	void getDeploymentByNameAndCategory(){
+		Assume.assumeNotNull(testDeploymentId)
 		Deployment foundDeploy = deploymentDs.getDeployment(TEST_PROCESS_NAME, TEST_PROCESS_CATEGORY)
 		log.info "foundDeploy:{} $foundDeploy"
 		assertNotNull(foundDeploy)
@@ -77,13 +82,24 @@ class DeploymentDSIntegrationTest {
 
 	@Test
 	void getDeploymentResources(){
+		Assume.assumeNotNull(testDeploymentId)
 		Set<DeploymentResource> deployResources = deploymentDs.getDeploymentResource(testDeploymentId)
 		assertNotNull(deployResources)
 		println "deployResources:{} $deployResources"
 	}
 
 	@Test
+	void paginateDeployment(){
+		Assume.assumeNotNull(testDeploymentId)
+		Map<DeploymentQueryParameter, String> deploymentQueryParameters =[:]
+		deploymentQueryParameters.put(DeploymentQueryParameter.nameLike,"laptop")
+		Page<Deployment> page = deploymentDs.paginateDeployment(deploymentQueryParameters, null)
+		println "page:{} $page"
+	}
+
+	@Test
 	void undeployment(){
+		Assume.assumeNotNull(testDeploymentId)
 		println "testDeploymentId:{} $testDeploymentId"
 		deploymentDs.unDeployment(testDeploymentId)
 	}

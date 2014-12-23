@@ -5,12 +5,12 @@ import groovy.transform.ToString
 import com.fasterxml.jackson.annotation.JsonIgnore
 
 @ToString(includeNames = true, includeFields=true)
-class Page {
+class Page<T> {
 	long totalCount
 	int totalPages
 	int pageOffset
 	int pageSize
-	List content =[]
+	List<T> content =[]
 	@JsonIgnore
 	def metaContent
 }

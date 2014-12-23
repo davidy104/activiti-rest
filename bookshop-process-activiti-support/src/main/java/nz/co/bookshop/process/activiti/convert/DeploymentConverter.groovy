@@ -4,8 +4,10 @@ import groovy.json.JsonSlurper
 import groovy.util.logging.Slf4j
 import nz.co.bookshop.process.activiti.convert.component.DeploymentMapToModel
 import nz.co.bookshop.process.activiti.convert.component.DeploymentResourceMapToModel
-import nz.co.bookshop.process.model.activiti.Deployment
-import nz.co.bookshop.process.model.activiti.DeploymentResource
+import nz.co.bookshop.process.activiti.convert.component.PageMapToModel
+import nz.co.bookshop.process.activiti.model.Deployment
+import nz.co.bookshop.process.activiti.model.DeploymentResource
+import nz.co.bookshop.process.model.Page
 
 import com.google.inject.Inject
 import com.google.inject.name.Named
@@ -24,6 +26,9 @@ class DeploymentConverter {
 	@Named("deploymentResourceMapToModel")
 	DeploymentResourceMapToModel deploymentResourceMapToModel
 
+	@Inject
+	PageMapToModel pageMapToModel
+
 	Deployment jsonToDeployment(final String jsonText){
 		return deploymentMapToModel.apply((Map)jsonSlurper.parseText(jsonText))
 	}
@@ -39,6 +44,19 @@ class DeploymentConverter {
 			deployments << deploymentMapToModel.apply((Map)it)
 		}
 		return deployments
+	}
+
+	Page<Deployment> jsonToDeploymentPage(final String jsonText){
+		Page<Deployment> page
+		Map resultMap = (Map)jsonSlurper.parseText(jsonText)
+		page = pageMapToModel.apply(resultMap)
+		List metaList = (List)resultMap['data']
+		if(metaList){
+			metaList.each {
+				page.content << deploymentMapToModel.apply((Map)it)
+			}
+		}
+		return page
 	}
 
 	Set<DeploymentResource> jsonToDeploymentResources(final String jsonText){

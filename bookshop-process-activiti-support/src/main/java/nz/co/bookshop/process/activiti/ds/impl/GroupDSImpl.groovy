@@ -7,9 +7,9 @@ import nz.co.bookshop.process.activiti.ActivitiRestClientAccessor
 import nz.co.bookshop.process.activiti.OperationType
 import nz.co.bookshop.process.activiti.convert.GroupConverter
 import nz.co.bookshop.process.activiti.ds.GroupDS
+import nz.co.bookshop.process.activiti.model.Group;
+import nz.co.bookshop.process.activiti.model.MemberShip;
 import nz.co.bookshop.process.model.Page
-import nz.co.bookshop.process.model.activiti.Group
-import nz.co.bookshop.process.model.activiti.MemberShip
 import nz.co.bookshop.process.util.RestClientExecuteCallback
 
 import org.apache.commons.lang3.StringUtils

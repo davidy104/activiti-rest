@@ -1,4 +1,4 @@
-package nz.co.bookshop.process.model.activiti
+package nz.co.bookshop.process.activiti.model
 
 import groovy.transform.ToString
 

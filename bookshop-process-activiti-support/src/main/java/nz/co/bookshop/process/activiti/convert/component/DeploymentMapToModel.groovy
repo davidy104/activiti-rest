@@ -4,7 +4,7 @@ import groovy.util.logging.Slf4j
 
 import java.text.SimpleDateFormat
 
-import nz.co.bookshop.process.model.activiti.Deployment
+import nz.co.bookshop.process.activiti.model.Deployment;
 
 import com.google.common.base.Function
 

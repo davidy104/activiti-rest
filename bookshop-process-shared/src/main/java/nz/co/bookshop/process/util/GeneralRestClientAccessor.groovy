@@ -13,7 +13,7 @@ import com.sun.jersey.api.client.ClientResponse
 import com.sun.jersey.api.client.WebResource
 
 @Slf4j
-abstract class GeneralRestClientAccessor implements RestClientAccessor {
+class GeneralRestClientAccessor implements RestClientAccessor {
 
 	protected Client jerseyClient
 	protected String hostUri

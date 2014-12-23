@@ -1,8 +1,8 @@
 package nz.co.bookshop.process.activiti.ds
 
+import nz.co.bookshop.process.activiti.model.Group;
+import nz.co.bookshop.process.activiti.model.MemberShip;
 import nz.co.bookshop.process.model.Page
-import nz.co.bookshop.process.model.activiti.Group
-import nz.co.bookshop.process.model.activiti.MemberShip
 
 interface GroupDS {
 	Group createGroup(Group group) throws Exception

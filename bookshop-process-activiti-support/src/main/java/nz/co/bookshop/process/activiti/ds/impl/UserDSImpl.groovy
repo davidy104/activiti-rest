@@ -8,8 +8,8 @@ import nz.co.bookshop.process.activiti.ActivitiRestClientAccessor
 import nz.co.bookshop.process.activiti.OperationType
 import nz.co.bookshop.process.activiti.convert.UserConverter
 import nz.co.bookshop.process.activiti.ds.UserDS
+import nz.co.bookshop.process.activiti.model.User;
 import nz.co.bookshop.process.model.Page
-import nz.co.bookshop.process.model.activiti.User
 import nz.co.bookshop.process.util.RestClientExecuteCallback
 
 import org.apache.commons.lang3.StringUtils
@@ -127,15 +127,15 @@ class UserDSImpl implements UserDS{
 	}
 
 	@Override
-	void updateUsersPicture(final String userId,InputStream pictureStream){
+	void updateUsersPicture(final String userId,final InputStream picStream){
 		checkArgument(!StringUtils.isEmpty(userId),"user id can not be null.")
 		final FormDataMultiPart multiPart = new FormDataMultiPart()
-		multiPart.bodyPart(new StreamDataBodyPart(userId+".png", pictureStream))
-		activitiRestClientAccessor.process(USER_PATH+userId,ClientResponse.Status.OK.code, new RestClientExecuteCallback(){
+		multiPart.bodyPart(new StreamDataBodyPart(userId+".jpg", picStream))
+		activitiRestClientAccessor.process(USER_PATH+userId+"/picture",ClientResponse.Status.NO_CONTENT.code, new RestClientExecuteCallback(){
 					@Override
 					ClientResponse execute(WebResource webResource) {
-						webResource.accept(MediaType.APPLICATION_JSON)
-								.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,multiPart)
+						webResource.type(MediaType.MULTIPART_FORM_DATA)
+								.accept(MediaType.APPLICATION_JSON).put(ClientResponse.class,multiPart)
 					}
 				})
 	}

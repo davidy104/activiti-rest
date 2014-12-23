@@ -5,8 +5,8 @@ import groovy.json.JsonSlurper
 import nz.co.bookshop.process.activiti.OperationType
 import nz.co.bookshop.process.activiti.convert.component.PageMapToModel
 import nz.co.bookshop.process.activiti.convert.component.UserMapToModel
+import nz.co.bookshop.process.activiti.model.User;
 import nz.co.bookshop.process.model.Page
-import nz.co.bookshop.process.model.activiti.User
 
 import com.google.inject.Inject
 

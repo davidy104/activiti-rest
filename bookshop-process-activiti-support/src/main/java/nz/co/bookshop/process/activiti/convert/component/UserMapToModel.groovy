@@ -1,10 +1,8 @@
 package nz.co.bookshop.process.activiti.convert.component;
 
-import groovy.util.logging.Slf4j;
+import groovy.util.logging.Slf4j
+import nz.co.bookshop.process.activiti.model.User;
 
-import java.util.Map;
-
-import com.amazonaws.services.identitymanagement.model.User
 import com.google.common.base.Function
 
 @Slf4j

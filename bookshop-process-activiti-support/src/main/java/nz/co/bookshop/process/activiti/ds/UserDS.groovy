@@ -1,7 +1,7 @@
 package nz.co.bookshop.process.activiti.ds;
 
+import nz.co.bookshop.process.activiti.model.User;
 import nz.co.bookshop.process.model.Page
-import nz.co.bookshop.process.model.activiti.User
 
 
 interface UserDS {
@@ -13,5 +13,5 @@ interface UserDS {
 	Set<User> getUsersByName(String firstName,String lastName)
 	Page paginatingUsersByGroupId(int pageOffset,int pageSize,String groupId)
 	Page paginatingUsers(int pageOffset,int pageSize)
-	void updateUsersPicture(String userId, InputStream pictureStream) throws Exception
+	void updateUsersPicture(String userId, InputStream picStream) throws Exception
 }

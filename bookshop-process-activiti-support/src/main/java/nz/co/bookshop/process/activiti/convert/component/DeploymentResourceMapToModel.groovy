@@ -1,7 +1,7 @@
 package nz.co.bookshop.process.activiti.convert.component
 
 import groovy.util.logging.Slf4j
-import nz.co.bookshop.process.model.activiti.DeploymentResource
+import nz.co.bookshop.process.activiti.model.DeploymentResource;
 
 import com.google.common.base.Function
 

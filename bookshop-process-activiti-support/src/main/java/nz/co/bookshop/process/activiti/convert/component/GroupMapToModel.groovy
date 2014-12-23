@@ -1,6 +1,6 @@
 package nz.co.bookshop.process.activiti.convert.component
 
-import nz.co.bookshop.process.model.activiti.Group
+import nz.co.bookshop.process.activiti.model.Group;
 
 import com.google.common.base.Function
 

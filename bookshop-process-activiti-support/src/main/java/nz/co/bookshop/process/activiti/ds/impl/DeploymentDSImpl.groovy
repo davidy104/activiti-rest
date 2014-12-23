@@ -7,8 +7,11 @@ import javax.ws.rs.core.MediaType
 import nz.co.bookshop.process.activiti.ActivitiRestClientAccessor
 import nz.co.bookshop.process.activiti.convert.DeploymentConverter
 import nz.co.bookshop.process.activiti.ds.DeploymentDS
-import nz.co.bookshop.process.model.activiti.Deployment
-import nz.co.bookshop.process.model.activiti.DeploymentResource
+import nz.co.bookshop.process.activiti.model.Deployment
+import nz.co.bookshop.process.activiti.model.DeploymentQueryParameter
+import nz.co.bookshop.process.activiti.model.DeploymentResource
+import nz.co.bookshop.process.model.Page
+import nz.co.bookshop.process.model.PagingAndSortingParameter
 import nz.co.bookshop.process.util.RestClientExecuteCallback
 
 import com.google.inject.Inject
@@ -28,7 +31,7 @@ class DeploymentDSImpl implements DeploymentDS{
 	@Inject
 	DeploymentConverter deploymentConverter
 
-	final static String DEPLOYMENT_PATH="/repository/deployments"
+	final static String DEPLOYMENT_PATH="/repository/deployments/"
 
 	@Override
 	Deployment deployment(final String name,final String category,final File uploadFile) {
@@ -96,5 +99,26 @@ class DeploymentDSImpl implements DeploymentDS{
 					}
 				})
 		return deploymentConverter.jsonToDeploymentResources(jsonResponse)
+	}
+
+	@Override
+	Page<Deployment> paginateDeployment(final Map<DeploymentQueryParameter, String> deploymentQueryParameters,final Map<PagingAndSortingParameter, String> pagingAndSortingParameters) {
+		return deploymentConverter.jsonToDeploymentPage(activitiRestClientAccessor.process(DEPLOYMENT_PATH, ClientResponse.Status.OK.code,new RestClientExecuteCallback(){
+			@Override
+			ClientResponse execute(WebResource webResource) {
+				if(deploymentQueryParameters){
+					deploymentQueryParameters.each {qk,qv->
+						webResource = webResource.queryParam(qk.name(), qv)
+					}
+				}
+				if(pagingAndSortingParameters){
+					pagingAndSortingParameters.each {pk,pv->
+						webResource = webResource.queryParam(pk.name(), pv)
+					}
+				}
+				webResource.accept(MediaType.APPLICATION_JSON)
+						.type(MediaType.APPLICATION_JSON).get(ClientResponse.class)
+			}
+		}))
 	}
 }
