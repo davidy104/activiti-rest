@@ -26,7 +26,7 @@ class ProcessDefinitionDSImpl implements ProcessDefinitionDS{
 
 	@Inject
 	ProcessDefinitionConverter processDefinitionConverter
-	
+
 	@Inject
 	GeneralModelConverter generalModelConverter
 
@@ -55,20 +55,22 @@ class ProcessDefinitionDSImpl implements ProcessDefinitionDS{
 
 	@Override
 	Set<Identity> getAllIdentities(final String processDefinitionId)  {
-		return null
+		return generalModelConverter.jsonToIdentities(activitiRestClientAccessor.get(PROCESS_DEFINITION_PATH + processDefinitionId+ "/identitylinks"))
 	}
 
 	@Override
-	Identity addIdentity(String processDefinitionId, Family family, String name) {
-		return null
+	Identity addIdentity(final String processDefinitionId,final Family family,final String name) {
+		final String requestBody = "{\"" + family.name() + "\" : \"" + name+ "\"}"
+		return generalModelConverter.jsonToIdentity(activitiRestClientAccessor.create(PROCESS_DEFINITION_PATH + processDefinitionId+ "/identitylinks", requestBody))
 	}
 
 	@Override
-	void deleteIdentity(String processDefinitionId, Family family, String identityId) {
+	void deleteIdentity(final String processDefinitionId,final Family family,final String identityId) {
+		activitiRestClientAccessor.delete(PROCESS_DEFINITION_PATH + processDefinitionId+ "/identitylinks/"+family.name+"/"+identityId)
 	}
 
 	@Override
-	Identity getIdentity(String processDefinitionId, Family family, String identityId)  {
-		return null
+	Identity getIdentity(final String processDefinitionId,final Family family,final String identityId)  {
+		return generalModelConverter.jsonToIdentity(activitiRestClientAccessor.get(PROCESS_DEFINITION_PATH + processDefinitionId+ "/identitylinks/"+family.name+"/"+identityId))
 	}
 }
