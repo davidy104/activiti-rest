@@ -2,6 +2,11 @@ package nz.co.bookshop.process.activiti.convert
 
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
+
+import java.text.DateFormat
+import java.text.SimpleDateFormat
+
+import nz.co.bookshop.process.activiti.ProcessAction
 import nz.co.bookshop.process.activiti.convert.component.PageMapToModel
 import nz.co.bookshop.process.activiti.convert.component.ProcessDefinitionMapToModel
 import nz.co.bookshop.process.activiti.model.ProcessDefinition
@@ -21,6 +26,8 @@ class ProcessDefinitionConverter {
 
 	@Inject
 	PageMapToModel pageMapToModel
+
+	final static DateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'")
 
 	ProcessDefinition jsonToProcessDefinition(final String jsonText){
 		return processDefinitionMapToModel.apply(jsonSlurper.parseText(jsonText))
@@ -48,5 +55,15 @@ class ProcessDefinitionConverter {
 			}
 		}
 		return page
+	}
+
+	String toProcessActionJson(final ProcessAction processAction,final boolean includeProcessInstances,final Date effectiveDate){
+		String effectiveDateStr = dateFormat.format(effectiveDate)
+		jsonBuilder{
+			action processAction.name()
+			includeProcessInstances includeProcessInstances
+			date effectiveDateStr
+		}
+		return jsonBuilder.toString()
 	}
 }

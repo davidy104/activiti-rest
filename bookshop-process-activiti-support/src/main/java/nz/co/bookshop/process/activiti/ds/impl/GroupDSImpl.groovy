@@ -1,7 +1,7 @@
 package nz.co.bookshop.process.activiti.ds.impl
 import static com.google.common.base.Preconditions.checkArgument
+import nz.co.bookshop.process.OperationType;
 import nz.co.bookshop.process.activiti.ActivitiRestClientAccessor
-import nz.co.bookshop.process.activiti.OperationType
 import nz.co.bookshop.process.activiti.convert.GroupConverter
 import nz.co.bookshop.process.activiti.ds.GroupDS
 import nz.co.bookshop.process.activiti.model.Group

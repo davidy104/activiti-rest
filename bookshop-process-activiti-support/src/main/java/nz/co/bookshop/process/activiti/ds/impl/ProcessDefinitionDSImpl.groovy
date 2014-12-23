@@ -3,6 +3,7 @@ package nz.co.bookshop.process.activiti.ds.impl
 import groovy.util.logging.Slf4j
 import nz.co.bookshop.process.activiti.ActivitiRestClientAccessor
 import nz.co.bookshop.process.activiti.Family
+import nz.co.bookshop.process.activiti.ProcessAction
 import nz.co.bookshop.process.activiti.convert.ProcessDefinitionConverter
 import nz.co.bookshop.process.activiti.ds.ProcessDefinitionDS
 import nz.co.bookshop.process.activiti.model.Identity
@@ -19,59 +20,51 @@ class ProcessDefinitionDSImpl implements ProcessDefinitionDS{
 	@Inject
 	@Named("activitiRestClientAccessor")
 	ActivitiRestClientAccessor activitiRestClientAccessor
-	
+
 	final static String PROCESS_DEFINITION_PATH="/repository/process-definitions/"
-	
+
 	@Inject
 	ProcessDefinitionConverter processDefinitionConverter
 
 	@Override
 	Page<ProcessDefinition> paginateProcessDefinition(final Map<ProcessDefinitionQueryParameter, String> processQueryParameters,final Integer pageOffset,final Integer pageSize) {
+		return processDefinitionConverter.jsonToprocessDefinitionPage(activitiRestClientAccessor.paginate(PROCESS_DEFINITION_PATH,processQueryParameters,pageOffset,pageSize))
+	}
+
+	@Override
+	ProcessDefinition updateCategory(final String processDefinitionId,final String category) {
+		final String requestEntity = "{\"category\" : \"" + category + "\"}"
+		return processDefinitionConverter.jsonToProcessDefinition(activitiRestClientAccessor.update(PROCESS_DEFINITION_PATH+processDefinitionId, requestEntity))
+	}
+
+	@Override
+	ProcessDefinition suspendProcessDefinition(final String processDefinitionId,final boolean includeProcessInstances,final Date effectiveDate) {
+		final String requestEntity = processDefinitionConverter.toProcessActionJson(ProcessAction.suspend,includeProcessInstances, effectiveDate)
+		return processDefinitionConverter.jsonToProcessDefinition(activitiRestClientAccessor.update(PROCESS_DEFINITION_PATH, requestEntity))
+	}
+
+	@Override
+	ProcessDefinition activeProcessDefinition(final String processDefinitionId,final boolean includeProcessInstances,final Date effectiveDate)  {
+		final String requestEntity = processDefinitionConverter.toProcessActionJson(ProcessAction.activate,includeProcessInstances, effectiveDate)
+		return processDefinitionConverter.jsonToProcessDefinition(activitiRestClientAccessor.update(PROCESS_DEFINITION_PATH, requestEntity))
+	}
+
+	@Override
+	Set<Identity> getAllIdentities(final String processDefinitionId)  {
 		return null
 	}
 
 	@Override
-	ProcessDefinition createProcessDefinition(ProcessDefinition addProcessDefinition) throws Exception {
+	Identity addIdentity(String processDefinitionId, Family family, String name) {
 		return null
 	}
 
 	@Override
-	ProcessDefinition updateCategory(String processDefinitionId, String category) throws Exception {
+	void deleteIdentity(String processDefinitionId, Family family, String identityId) {
+	}
+
+	@Override
+	Identity getIdentity(String processDefinitionId, Family family, String identityId)  {
 		return null
-	}
-
-	@Override
-	ProcessDefinition suspendProcessDefinition(String processDefinitionId, boolean includeProcessInstances, Date effectiveDate) throws Exception {
-		return null
-	}
-
-	@Override
-	public ProcessDefinition activeProcessDefinition(String processDefinitionId, boolean includeProcessInstances, Date effectiveDate) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Set<Identity> getAllIdentities(String processDefinitionId) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public Identity addIdentity(String processDefinitionId, Family family, String name) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
-	public void deleteIdentity(String processDefinitionId, Family family, String identityId) throws Exception {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public Identity getIdentity(String processDefinitionId, Family family, String identityId) throws Exception {
-		// TODO Auto-generated method stub
-		return null;
 	}
 }

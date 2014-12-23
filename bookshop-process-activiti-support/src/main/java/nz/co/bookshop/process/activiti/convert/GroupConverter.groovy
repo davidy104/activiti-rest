@@ -2,7 +2,7 @@ package nz.co.bookshop.process.activiti.convert
 
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
-import nz.co.bookshop.process.activiti.OperationType
+import nz.co.bookshop.process.OperationType;
 import nz.co.bookshop.process.activiti.convert.component.GroupMapToModel
 import nz.co.bookshop.process.activiti.convert.component.MembershipMapToModel
 import nz.co.bookshop.process.activiti.convert.component.PageMapToModel
