@@ -4,8 +4,10 @@ import static com.google.common.base.Preconditions.checkArgument
 
 import javax.ws.rs.core.MediaType
 
+import nz.co.bookshop.process.AbstractEnumQueryParameter
 import nz.co.bookshop.process.activiti.ActivitiRestClientAccessor
 import nz.co.bookshop.process.activiti.OperationType
+import nz.co.bookshop.process.activiti.PagingAndSortingParameter
 import nz.co.bookshop.process.activiti.convert.UserConverter
 import nz.co.bookshop.process.activiti.ds.UserDS
 import nz.co.bookshop.process.activiti.model.User
@@ -106,20 +108,17 @@ class UserDSImpl implements UserDS{
 
 	@Override
 	Page paginatingUsers(final Map<UserQueryParameter, String> userQueryParameters,final Integer pageOffset,final Integer pageSize) {
-		return userConverter.jsonToUserPage(activitiRestClientAccessor.process(USER_PATH,ClientResponse.Status.OK.code, new RestClientExecuteCallback(){
+		Map<? extends AbstractEnumQueryParameter,String> queryParameterMap = [:]
+		queryParameterMap.putAll(userQueryParameters)
+		if(pageOffset){
+			queryParameterMap.put(PagingAndSortingParameter.start, String.valueOf(pageOffset))
+		}
+		if(pageSize){
+			queryParameterMap.put(PagingAndSortingParameter.size, String.valueOf(pageSize))
+		}
+		return userConverter.jsonToUserPage(activitiRestClientAccessor.process(USER_PATH,queryParameterMap,ClientResponse.Status.OK.code, new RestClientExecuteCallback(){
 			@Override
 			ClientResponse execute(WebResource webResource) {
-				if(userQueryParameters){
-					userQueryParameters.each {k,v->
-						webResource = webResource.queryParam(k.name(),v)
-					}
-				}
-				if(pageOffset){
-					webResource.queryParam("start", pageOffset)
-				}
-				if(pageSize){
-					webResource.queryParam("size", pageSize)
-				}
 				webResource.accept(MediaType.APPLICATION_JSON)
 						.type(MediaType.APPLICATION_JSON).get(ClientResponse.class)
 			}

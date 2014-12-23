@@ -5,7 +5,7 @@ import groovy.transform.ToString
 
 @ToString(includeNames = true, includeFields=true)
 @EqualsAndHashCode(includes=["id","url","key","version","name"])
-class ProcessDefinition implements Serializable {
+class ProcessDefinition {
 	String id;
 	String url;
 	String key;

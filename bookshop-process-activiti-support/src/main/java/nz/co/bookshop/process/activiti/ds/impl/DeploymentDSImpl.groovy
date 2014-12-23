@@ -41,84 +41,40 @@ class DeploymentDSImpl implements DeploymentDS{
 		final FormDataMultiPart multiPart = new FormDataMultiPart()
 		multiPart.field("tenantId", tenantId)
 		multiPart.bodyPart(new FileDataBodyPart(uploadName, uploadFile))
-
-		String jsonResponse = activitiRestClientAccessor.process(DEPLOYMENT_PATH,ClientResponse.Status.CREATED.code, new RestClientExecuteCallback(){
-					@Override
-					ClientResponse execute(WebResource webResource) {
-						webResource.type(MediaType.MULTIPART_FORM_DATA)
-								.accept(MediaType.APPLICATION_JSON)
-								.post(ClientResponse.class, multiPart)
-					}
-				})
-
-		return deploymentConverter.jsonToDeployment(jsonResponse)
+		return deploymentConverter.jsonToDeployment(activitiRestClientAccessor.process(DEPLOYMENT_PATH,ClientResponse.Status.CREATED.code, new RestClientExecuteCallback(){
+			@Override
+			ClientResponse execute(WebResource webResource) {
+				webResource.type(MediaType.MULTIPART_FORM_DATA)
+						.accept(MediaType.APPLICATION_JSON)
+						.post(ClientResponse.class, multiPart)
+			}
+		}))
 	}
 
 	@Override
 	Deployment getDeployment(final String deployName,final String deployCategory) {
-		String jsonResponse = activitiRestClientAccessor.process(DEPLOYMENT_PATH,ClientResponse.Status.OK.code, new RestClientExecuteCallback(){
-					@Override
-					ClientResponse execute(WebResource webResource) {
-						webResource.queryParam("tenantId", "$deployName:$deployCategory").accept(MediaType.APPLICATION_JSON)
-								.type(MediaType.APPLICATION_JSON).get(ClientResponse.class)
-					}
-				})
-		return deploymentConverter.jsonToDeployments(jsonResponse).first()
+		Map<DeploymentQueryParameter, String> deploymentQueryParameters = [:]
+		deploymentQueryParameters.put(DeploymentQueryParameter.tenantId, "$deployName:$deployCategory")
+		return deploymentConverter.jsonToDeployments(activitiRestClientAccessor.query(DEPLOYMENT_PATH, deploymentQueryParameters)).first()
 	}
 
 	@Override
 	Deployment getDeployment(final String deploymentId){
-		return deploymentConverter.jsonToDeployment(activitiRestClientAccessor.process(DEPLOYMENT_PATH+deploymentId, ClientResponse.Status.OK.code,new RestClientExecuteCallback(){
-			@Override
-			ClientResponse execute(WebResource webResource) {
-				webResource.accept(MediaType.APPLICATION_JSON)
-						.type(MediaType.APPLICATION_JSON).get(ClientResponse.class)
-			}
-		}))
+		return deploymentConverter.jsonToDeployment(activitiRestClientAccessor.get(DEPLOYMENT_PATH+deploymentId))
 	}
 
 	@Override
 	void unDeployment(final String deploymentId) {
-		activitiRestClientAccessor.process(DEPLOYMENT_PATH+deploymentId,ClientResponse.Status.NO_CONTENT.code, new RestClientExecuteCallback(){
-					@Override
-					ClientResponse execute(WebResource webResource) {
-						webResource.accept(MediaType.APPLICATION_JSON)
-								.delete(ClientResponse.class)
-					}
-				})
+		activitiRestClientAccessor.delete(DEPLOYMENT_PATH+deploymentId)
 	}
 
 	@Override
 	Set<DeploymentResource> getDeploymentResource(final String deploymentId) {
-		String jsonResponse = activitiRestClientAccessor.process(DEPLOYMENT_PATH+deploymentId+'/resources',ClientResponse.Status.OK.code, new RestClientExecuteCallback(){
-					@Override
-					ClientResponse execute(WebResource webResource) {
-						webResource.accept(MediaType.APPLICATION_JSON)
-								.type(MediaType.APPLICATION_JSON).get(ClientResponse.class)
-					}
-				})
-		return deploymentConverter.jsonToDeploymentResources(jsonResponse)
+		return deploymentConverter.jsonToDeploymentResources(activitiRestClientAccessor.get(DEPLOYMENT_PATH+deploymentId+'/resources'))
 	}
 
 	@Override
 	Page<Deployment> paginateDeployment(final Map<DeploymentQueryParameter, String> deploymentQueryParameters,final Integer pageOffset,final Integer pageSize) {
-		return deploymentConverter.jsonToDeploymentPage(activitiRestClientAccessor.process(DEPLOYMENT_PATH, ClientResponse.Status.OK.code,new RestClientExecuteCallback(){
-			@Override
-			ClientResponse execute(WebResource webResource) {
-				if(deploymentQueryParameters){
-					deploymentQueryParameters.each {qk,qv->
-						webResource = webResource.queryParam(qk.name(), qv)
-					}
-				}
-				if(pageOffset){
-					webResource = webResource.queryParam("start", pageOffset)
-				}
-				if(pageSize){
-					webResource = webResource.queryParam("size", pageSize)
-				}
-				webResource.accept(MediaType.APPLICATION_JSON)
-						.type(MediaType.APPLICATION_JSON).get(ClientResponse.class)
-			}
-		}))
+		return deploymentConverter.jsonToDeploymentPage(activitiRestClientAccessor.paginate(DEPLOYMENT_PATH, deploymentQueryParameters, pageOffset, pageSize))
 	}
 }

@@ -1,8 +1,5 @@
 package nz.co.bookshop.process.activiti.ds.impl
 import static com.google.common.base.Preconditions.checkArgument
-
-import javax.ws.rs.core.MediaType
-
 import nz.co.bookshop.process.activiti.ActivitiRestClientAccessor
 import nz.co.bookshop.process.activiti.OperationType
 import nz.co.bookshop.process.activiti.convert.GroupConverter
@@ -11,14 +8,11 @@ import nz.co.bookshop.process.activiti.model.Group
 import nz.co.bookshop.process.activiti.model.GroupQueryParameter
 import nz.co.bookshop.process.activiti.model.MemberShip
 import nz.co.bookshop.process.model.Page
-import nz.co.bookshop.process.util.RestClientExecuteCallback
 
 import org.apache.commons.lang3.StringUtils
 
 import com.google.inject.Inject
 import com.google.inject.name.Named
-import com.sun.jersey.api.client.ClientResponse
-import com.sun.jersey.api.client.WebResource
 
 class GroupDSImpl implements GroupDS{
 
@@ -35,59 +29,31 @@ class GroupDSImpl implements GroupDS{
 	Group createGroup(final Group group) {
 		checkArgument(!StringUtils.isEmpty(group.id),"group id can not be null.")
 		final String groupCreateJson = groupConverter.groupToJson(group, OperationType.CREATION)
-		return groupConverter.jsonToGroup(activitiRestClientAccessor.process(GROUP_PATH,ClientResponse.Status.CREATED.code, new RestClientExecuteCallback(){
-			@Override
-			ClientResponse execute(WebResource webResource) {
-				webResource.accept(MediaType.APPLICATION_JSON)
-						.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,groupCreateJson)
-			}
-		}))
+		return groupConverter.jsonToGroup(activitiRestClientAccessor.create(GROUP_PATH, groupCreateJson))
 	}
 
 	@Override
 	Group getGroupById(final String groupId)  {
-		return groupConverter.jsonToGroup(activitiRestClientAccessor.process(GROUP_PATH+groupId,ClientResponse.Status.OK.code, new RestClientExecuteCallback(){
-			@Override
-			ClientResponse execute(WebResource webResource) {
-				webResource.accept(MediaType.APPLICATION_JSON)
-						.type(MediaType.APPLICATION_JSON).get(ClientResponse.class)
-			}
-		}))
+		return groupConverter.jsonToGroup(activitiRestClientAccessor.get(GROUP_PATH+groupId))
 	}
 
 	@Override
 	Group getGroupByUserId(final String userId)  {
-		return groupConverter.jsonToGroups(activitiRestClientAccessor.process(GROUP_PATH,ClientResponse.Status.OK.code, new RestClientExecuteCallback(){
-			@Override
-			ClientResponse execute(WebResource webResource) {
-				webResource.queryParam("member", userId).accept(MediaType.APPLICATION_JSON)
-						.type(MediaType.APPLICATION_JSON).get(ClientResponse.class)
-			}
-		})).first()
+		Map<GroupQueryParameter,String> groupQueryParameters = [:]
+		groupQueryParameters.put(GroupQueryParameter.member, userId)
+		return groupConverter.jsonToGroups(activitiRestClientAccessor.query(GROUP_PATH, groupQueryParameters)).first()
 	}
 
 	@Override
 	Page<Group> paginateGroup(final Map<GroupQueryParameter,String> groupQueryParameters,final Integer pageOffset,final Integer pageSize) {
-		return groupConverter.jsonToGroupPage(activitiRestClientAccessor.process(GROUP_PATH,ClientResponse.Status.OK.code, new RestClientExecuteCallback(){
-			@Override
-			ClientResponse execute(WebResource webResource) {
-				webResource.queryParam("start", pageOffset).queryParam("size", pageSize).accept(MediaType.APPLICATION_JSON)
-						.type(MediaType.APPLICATION_JSON).get(ClientResponse.class)
-			}
-		}))
+		return groupConverter.jsonToGroupPage(activitiRestClientAccessor.paginate(GROUP_PATH,groupQueryParameters,pageOffset,pageSize))
 	}
 
 
 	@Override
 	void deleteGroup(final String groupId) {
 		checkArgument(!StringUtils.isEmpty(groupId),"groupId can not be null.")
-		activitiRestClientAccessor.process(GROUP_PATH+groupId,ClientResponse.Status.NO_CONTENT.code, new RestClientExecuteCallback(){
-					@Override
-					ClientResponse execute(WebResource webResource) {
-						webResource.accept(MediaType.APPLICATION_JSON)
-								.type(MediaType.APPLICATION_JSON).delete(ClientResponse.class)
-					}
-				})
+		activitiRestClientAccessor.delete(GROUP_PATH+groupId)
 	}
 
 	@Override
@@ -95,25 +61,13 @@ class GroupDSImpl implements GroupDS{
 		checkArgument(!StringUtils.isEmpty(groupId),"groupId can not be null.")
 		checkArgument(!StringUtils.isEmpty(userId),"userId can not be null.")
 		final String requestBody ="{\"userId\":\""+userId+"\"}"
-		return groupConverter.jsonToMemberShip(activitiRestClientAccessor.process(GROUP_PATH+groupId+"/members",ClientResponse.Status.CREATED.code, new RestClientExecuteCallback(){
-			@Override
-			ClientResponse execute(WebResource webResource) {
-				webResource.accept(MediaType.APPLICATION_JSON)
-						.type(MediaType.APPLICATION_JSON).post(ClientResponse.class,requestBody)
-			}
-		}))
+		return groupConverter.jsonToMemberShip(activitiRestClientAccessor.create(GROUP_PATH+groupId+"/members", requestBody))
 	}
 
 	@Override
 	void deleteMemberFromGroup(final String groupId,final String userId) {
 		checkArgument(!StringUtils.isEmpty(groupId),"groupId can not be null.")
 		checkArgument(!StringUtils.isEmpty(userId),"userId can not be null.")
-		activitiRestClientAccessor.process(GROUP_PATH+groupId+"/members"+userId,ClientResponse.Status.NO_CONTENT.code, new RestClientExecuteCallback(){
-					@Override
-					ClientResponse execute(WebResource webResource) {
-						webResource.accept(MediaType.APPLICATION_JSON)
-								.type(MediaType.APPLICATION_JSON).delete(ClientResponse.class)
-					}
-				})
+		activitiRestClientAccessor.delete(GROUP_PATH+groupId+"/members"+userId)
 	}
 }

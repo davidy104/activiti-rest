@@ -3,6 +3,7 @@ import static com.google.common.base.Preconditions.checkArgument
 import static com.google.common.base.Preconditions.checkState
 import static nz.co.bookshop.process.util.JerseyClientUtil.getResponsePayload
 import groovy.util.logging.Slf4j
+import nz.co.bookshop.process.AbstractEnumQueryParameter
 import nz.co.bookshop.process.ConflictException
 import nz.co.bookshop.process.NotFoundException
 
@@ -23,14 +24,35 @@ class GeneralRestClientAccessor {
 		this.hostUri = hostUri;
 	}
 
-	String process(final String path,final int expectedStatus,final RestClientExecuteCallback restClientCallback,final RestClientCustomErrorHandler... customErrorHandlers)  {
+	protected String process(String path,final Map<? extends AbstractEnumQueryParameter,String> emunQueryParameters, final int expectedStatus,final RestClientExecuteCallback restClientCallback,final RestClientCustomErrorHandler... customErrorHandlers)  {
 		checkArgument(!StringUtils.isEmpty(path),"path can not be null")
 		checkArgument(restClientCallback != null,"restClientCallback can not be null")
-		def meta
+		WebResource webResource = jerseyClient.resource(hostUri)
+		if(emunQueryParameters){
+			emunQueryParameters.each{ k,v->
+				webResource = webResource.queryParam(k.name(), v)
+			}
+		}
+		if(path.lastIndexOf('/') == path.length()-1){
+			path = path.substring(0, path.lastIndexOf('/'))
+		}
+		webResource = webResource.path(path)
+		final ClientResponse clientResponse = restClientCallback.execute(webResource)
+		final int statusCode = clientResponse.getStatus()
+		final String respStr = getResponsePayload(clientResponse)
+		if(statusCode != expectedStatus){
+			this.doErrorHandle(statusCode, respStr, customErrorHandlers)
+		}
+		return respStr
+	}
+
+	protected String process(final String path,final int expectedStatus,final RestClientExecuteCallback restClientCallback,final RestClientCustomErrorHandler... customErrorHandlers)  {
+		checkArgument(!StringUtils.isEmpty(path),"path can not be null")
+		checkArgument(restClientCallback != null,"restClientCallback can not be null")
 		WebResource webResource = jerseyClient.resource(hostUri).path(path)
-		ClientResponse clientResponse = restClientCallback.execute(webResource)
-		int statusCode = clientResponse.getStatus()
-		String respStr = getResponsePayload(clientResponse)
+		final ClientResponse clientResponse = restClientCallback.execute(webResource)
+		final int statusCode = clientResponse.getStatus()
+		final String respStr = getResponsePayload(clientResponse)
 		if(statusCode != expectedStatus){
 			this.doErrorHandle(statusCode, respStr, customErrorHandlers)
 		}

@@ -92,8 +92,8 @@ class DeploymentDSIntegrationTest {
 	void paginateDeployment(){
 		Assume.assumeNotNull(testDeploymentId)
 		Map<DeploymentQueryParameter, String> deploymentQueryParameters =[:]
-		deploymentQueryParameters.put(DeploymentQueryParameter.nameLike,"laptop")
-		Page<Deployment> page = deploymentDs.paginateDeployment(deploymentQueryParameters, null)
+		deploymentQueryParameters.put(DeploymentQueryParameter.tenantId,"laptop:order")
+		Page<Deployment> page = deploymentDs.paginateDeployment(deploymentQueryParameters, 0,10)
 		println "page:{} $page"
 	}
 
