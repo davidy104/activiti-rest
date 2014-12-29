@@ -66,11 +66,11 @@ class ProcessDefinitionDSImpl implements ProcessDefinitionDS{
 
 	@Override
 	void deleteIdentity(final String processDefinitionId,final Family family,final String identityId) {
-		activitiRestClientAccessor.delete(PROCESS_DEFINITION_PATH + processDefinitionId+ "/identitylinks/"+family.name+"/"+identityId)
+		activitiRestClientAccessor.delete(PROCESS_DEFINITION_PATH + processDefinitionId+ "/identitylinks/"+family.name()+"/"+identityId)
 	}
 
 	@Override
 	Identity getIdentity(final String processDefinitionId,final Family family,final String identityId)  {
-		return generalModelConverter.jsonToIdentity(activitiRestClientAccessor.get(PROCESS_DEFINITION_PATH + processDefinitionId+ "/identitylinks/"+family.name+"/"+identityId))
+		return generalModelConverter.jsonToIdentity(activitiRestClientAccessor.get(PROCESS_DEFINITION_PATH + processDefinitionId+ "/identitylinks/"+family.name()+"/"+identityId))
 	}
 }
