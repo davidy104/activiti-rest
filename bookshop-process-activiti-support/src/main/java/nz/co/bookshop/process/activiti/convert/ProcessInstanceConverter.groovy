@@ -1,5 +1,7 @@
 package nz.co.bookshop.process.activiti.convert;
 
+import java.util.Map;
+
 import groovy.json.JsonBuilder
 import groovy.json.JsonSlurper
 import nz.co.bookshop.process.activiti.convert.component.PageMapToModel
@@ -22,6 +24,29 @@ class ProcessInstanceConverter {
 
 	@Inject
 	PageMapToModel pageMapToModel
+
+	String toProcessInstanceJson(final String processDefinitionId,final String processDefinitionKey,final String businessKey,final Map<String, Object> variables){
+		jsonBuilder{
+			if(processDefinitionId){
+				processDefinitionId "${processDefinitionId}"
+			}
+			if(processDefinitionKey){
+				processDefinitionKey "${processDefinitionKey}"
+			}
+
+			if(businessKey){
+				businessKey "${businessKey}"
+			}
+			if(variables){
+				variables(
+						variables.collect {key, val ->
+							[name:"${key}",value:"${val}"]
+						}
+						)
+			}
+		}
+		return jsonBuilder.toString()
+	}
 
 	ProcessInstance jsonToProcessInstance(final String jsonText){
 		return processInstanceMapToModel.apply((Map)jsonSlurper.parseText(jsonText))

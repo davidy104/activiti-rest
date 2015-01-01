@@ -12,7 +12,6 @@ interface ProcessInstanceDS {
 	ProcessInstance startProcessByProcessDefinitionId(String processDefinitionId, String businessKey,Map<String, Object> variables) throws Exception
 	ProcessInstance startProcessByProcessDefinitionKey(String processDefinitionKey, String businessKey,Map<String, Object> variables) throws Exception
 	ProcessInstance getProcessInstance(String processInstanceId)throws Exception
-	void getLegacyProcessInstance(String processInstanceId)throws Exception
 	void deleteProcessInstance(String processInstanceId) throws Exception
 	ProcessInstance suspendProcessInstance(String processInstanceId)throws Exception
 	ProcessInstance activeProcessInstance(String processInstanceId)throws Exception
