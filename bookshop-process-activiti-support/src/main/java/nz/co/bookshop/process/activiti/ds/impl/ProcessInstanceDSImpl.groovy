@@ -1,5 +1,6 @@
 package nz.co.bookshop.process.activiti.ds.impl;
 
+import nz.co.bookshop.process.OperationType
 import nz.co.bookshop.process.activiti.ActivitiRestClientAccessor
 import nz.co.bookshop.process.activiti.IdentityType
 import nz.co.bookshop.process.activiti.Variable
@@ -71,31 +72,36 @@ class ProcessInstanceDSImpl implements ProcessInstanceDS {
 
 	@Override
 	Identity addInvolvedPeopleToProcess(final String processInstanceId,final String user,final IdentityType identityType)  {
-		return null
+		final String jsonRequest = "{\"userId\":\"" + user + "\",\"type\":\""
+		+ identityType.name() + "\"}";
+		return generalModelConverter.jsonToIdentity(activitiRestClientAccessor.create(PROCESS_INSTANCE_PATH+ processInstanceId+ "/identitylinks", jsonRequest))
 	}
 
 	@Override
 	void removeInvolvedPeopleFromProcess(final String processInstanceId,final String user,final IdentityType identityType)  {
+		activitiRestClientAccessor.delete(PROCESS_INSTANCE_PATH+ processInstanceId+ "/identitylinks/users/"+user+"/"+identityType.name())
 	}
 
 	@Override
 	Set<Variable> getVariablesFromProcess(final String processInstanceId) {
-		return null
+		return generalModelConverter.jsonToVariables(activitiRestClientAccessor.get(PROCESS_INSTANCE_PATH+ processInstanceId+ "/variables"))
 	}
 
 	@Override
 	Variable getVariableFromProcess(final String processInstanceId,final String variableName) {
-		return null
+		return generalModelConverter.jsonToVariable(activitiRestClientAccessor.get(PROCESS_INSTANCE_PATH+ processInstanceId+ "/variables/"+variableName))
 	}
 
 	@Override
 	Set<Variable> createVariablesForProcess(final String processInstanceId,final Set<Variable> addVariables) {
-		return null
+		final String jsonRequest = generalModelConverter.toVariablesJson(addVariables)
+		return generalModelConverter.jsonToVariables(activitiRestClientAccessor.create(PROCESS_INSTANCE_PATH+ processInstanceId+"/variables", jsonRequest))
 	}
 
 	@Override
 	Variable updateVariableForProcess(final String processInstanceId,
 			final String variableName,final Variable updateVariable) {
-		return null
+		final String updateJson = generalModelConverter.toVariableJson(updateVariable, OperationType.UPDATE)
+		return 	generalModelConverter.jsonToVariable(activitiRestClientAccessor.update(PROCESS_INSTANCE_PATH+ processInstanceId+"/variables/"+variableName, updateJson))
 	}
 }
