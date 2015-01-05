@@ -1,6 +1,6 @@
 package nz.co.bookshop.process.activiti.ds.impl
 import static com.google.common.base.Preconditions.checkArgument
-import nz.co.bookshop.process.OperationType;
+import nz.co.bookshop.process.OperationType
 import nz.co.bookshop.process.activiti.ActivitiRestClientAccessor
 import nz.co.bookshop.process.activiti.convert.GroupConverter
 import nz.co.bookshop.process.activiti.ds.GroupDS
@@ -48,7 +48,6 @@ class GroupDSImpl implements GroupDS{
 	Page<Group> paginateGroup(final Map<GroupQueryParameter,String> groupQueryParameters,final Integer pageOffset,final Integer pageSize) {
 		return groupConverter.jsonToGroupPage(activitiRestClientAccessor.paginate(GROUP_PATH,groupQueryParameters,pageOffset,pageSize))
 	}
-
 
 	@Override
 	void deleteGroup(final String groupId) {
